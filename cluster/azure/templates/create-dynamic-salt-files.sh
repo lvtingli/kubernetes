@@ -14,13 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cert_dir=/srv/kubernetes
-cert_group=kube-cert
+# Create the overlay files for the salt tree.  We create these in a separate
+# place so that we can blow away the rest of the salt configs on a kube-push and
+# re-apply these.
 
-mkdir -p "$cert_dir"
+mkdir -p /srv/salt-overlay/pillar
+cat <<EOF >/srv/salt-overlay/pillar/cluster-params.sls
+instance_prefix: '$(echo "$INSTANCE_PREFIX" | sed -e "s/'/''/g")'
+node_instance_prefix: $NODE_INSTANCE_PREFIX
+service_cluster_ip_range: $SERVICE_CLUSTER_IP_RANGE
+admission_control: '$(echo "$ADMISSION_CONTROL" | sed -e "s/'/''/g")'
+EOF
 
-openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
-  -subj "/CN=kubernetes.invalid/O=Kubernetes" \
-  -keyout "${cert_dir}/server.key" -out "${cert_dir}/server.cert"
-chgrp $cert_group "${cert_dir}/server.key" "${cert_dir}/server.cert"
-chmod 660 "${cert_dir}/server.key" "${cert_dir}/server.cert"
+mkdir -p /srv/salt-overlay/salt/nginx
+echo $MASTER_HTPASSWD > /srv/salt-overlay/salt/nginx/htpasswd

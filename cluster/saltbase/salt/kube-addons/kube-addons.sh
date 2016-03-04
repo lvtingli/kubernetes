@@ -144,7 +144,7 @@ function load-docker-images() {
     success=true
     restart_docker=false
     for image in "$1/"*; do
-      timeout 30 docker load -i "${image}" &>/dev/null
+      timeout 120 docker load -i "${image}" &>/dev/null
       rc=$?
       if [[ "$rc" == 124 ]]; then
         restart_docker=true

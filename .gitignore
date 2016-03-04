@@ -93,3 +93,4 @@ kubernetes/
 
 # direnv .envrc files
 .envrc
+cluster/saltbase/pillar/logging.sls

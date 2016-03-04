@@ -12,7 +12,7 @@
 {% endif %}
 {% endif %}
 
-{% if grains['cloud'] is defined and grains.cloud in [ 'aws', 'gce', 'vagrant' ,'vsphere']  %}
+{% if grains['cloud'] is defined and grains.cloud in [ 'aws', 'gce', 'vagrant' ,'vsphere','azure']  %}
 /srv/kubernetes/basic_auth.csv:
   file.managed:
     - source: salt://kube-apiserver/basic_auth.csv

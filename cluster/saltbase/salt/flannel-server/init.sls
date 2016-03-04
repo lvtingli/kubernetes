@@ -27,3 +27,5 @@ touch /var/log/etcd_flannel.log:
         etcd_port: 4003
         etcd_peer_port: 2382
         cpulimit: '"100m"'
+        memlimit: '"50Mi"'
+

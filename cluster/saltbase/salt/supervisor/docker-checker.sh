@@ -31,11 +31,11 @@ rm -rf /var/lib/docker/network
 
 /etc/init.d/docker start
 
-echo "waiting 30s for startup"
-sleep 30
+echo "waiting two minute for startup"
+sleep 120
 
 while true; do
-  if ! sudo timeout 10 docker version > /dev/null; then
+  if ! sudo timeout 20 docker ps > /dev/null; then
     echo "Docker failed!"
     exit 2
   fi

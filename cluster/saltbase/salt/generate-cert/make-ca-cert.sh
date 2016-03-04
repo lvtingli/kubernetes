@@ -26,8 +26,8 @@ fi
 
 cert_ip=$1
 extra_sans=${2:-}
-cert_dir=${CERT_DIR:-/srv/kubernetes}
-cert_group=${CERT_GROUP:-kube-cert}
+cert_dir=/srv/kubernetes
+cert_group=kube-cert
 
 mkdir -p "$cert_dir"
 
@@ -40,6 +40,11 @@ fi
 
 if [ "$cert_ip" == "_use_aws_external_ip_" ]; then
   cert_ip=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+fi
+
+if [ "$cert_ip" == "_use_azure_dns_name_" ]; then
+  cert_ip=$(uname -n | awk -F. '{ print $2 }').cloudapp.net
+  use_cn=true
 fi
 
 sans="IP:${cert_ip}"

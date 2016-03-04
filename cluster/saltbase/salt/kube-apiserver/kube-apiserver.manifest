@@ -9,7 +9,7 @@
 {% set cloud_config_volume = "" -%}
 
 {% if grains.cloud is defined -%}
-  {% if grains.cloud not in ['vagrant', 'vsphere'] -%}
+  {% if grains.cloud not in ['vagrant', 'vsphere', 'azure'] -%}
     {% set cloud_provider = "--cloud-provider=" + grains.cloud -%}
   {% endif -%}
 
@@ -41,7 +41,11 @@
 {% endif -%}
 
 {% set etcd_servers = "--etcd-servers=http://127.0.0.1:4001" -%}
-{% set etcd_servers_overrides = "--etcd-servers-overrides=/events#http://127.0.0.1:4002" -%}
+{% set etcd_servers_overrides = "" -%}
+# If there are more than 50 nodes, there is a dedicated etcd instance for events.
+{% if pillar['num_nodes'] is defined and pillar['num_nodes'] > 50 -%}
+	{% set etcd_servers_overrides = "--etcd-servers-overrides=/events#http://127.0.0.1:4002" -%}
+{% endif -%}
 
 {% set service_cluster_ip_range = "" -%}
 {% if pillar['service_cluster_ip_range'] is defined -%}
@@ -72,7 +76,7 @@
 {% endif -%}
 {% endif -%}
 
-{% if grains['cloud'] is defined and grains.cloud in [ 'aws', 'gce', 'vagrant', 'vsphere']  %}
+{% if grains['cloud'] is defined and grains.cloud in [ 'aws', 'gce', 'vagrant', 'vsphere', 'azure']  %}
   {% set basic_auth_file = "--basic-auth-file=/srv/kubernetes/basic_auth.csv" -%}
 {% endif -%}
 

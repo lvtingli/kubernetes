@@ -60,8 +60,8 @@
                     }
                 ],
                 "resources": {
-                    "requests": {
-                        "cpu": {{ cpulimit }}
+                    "limits": {
+                        "cpu": "100m"
                     }
                 },
                 "volumeMounts": [
@@ -89,8 +89,9 @@
                     "timeoutSeconds": 15
                 },
                 "resources": {
-                    "requests": {
-                        "cpu": {{ cpulimit }}
+                    "limits": {
+                        "cpu": {{ cpulimit }},
+                        "memory": {{ memlimit }}
                     }
                 },
                 "volumeMounts": [

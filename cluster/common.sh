@@ -65,39 +65,35 @@ function create-kubeconfig() {
   fi
   local cluster_args=(
       "--server=${KUBE_SERVER:-https://${KUBE_MASTER_IP}}"
-       "--insecure-skip-tls-verify=true"
   )
+  if [[ -z "${CA_CERT:-}" ]]; then
+    cluster_args+=("--insecure-skip-tls-verify=true")
+  else
+    cluster_args+=(
+      "--certificate-authority=${CA_CERT}"
+      "--embed-certs=true"
+    )
+  fi
 
   local user_args=()
-  # if you set the username and pass or token, do not need ca and cert and key
-  # we only need to method for authentication
   if [[ ! -z "${KUBE_BEARER_TOKEN:-}" ]]; then
     user_args+=(
      "--token=${KUBE_BEARER_TOKEN}"
-      
     )
   elif [[ ! -z "${KUBE_USER:-}" && ! -z "${KUBE_PASSWORD:-}" ]]; then
     user_args+=(
      "--username=${KUBE_USER}"
      "--password=${KUBE_PASSWORD}"
-       )
-  else
-    if [[ ! -z "${KUBE_CERT:-}" && ! -z "${KUBE_KEY:-}" ]]; then
-      user_args+=(
-       "--client-certificate=${KUBE_CERT}"
-       "--client-key=${KUBE_KEY}"
-       "--embed-certs=true"
-      )
-    fi
-    if [[ ! -z "${CA_CERT:-}" ]]; then
-      cluster_args+=(
-       "--certificate-authority=${CA_CERT}"
-       "--embed-certs=true"
-      )
-    fi
+    )
+  fi
+  if [[ ! -z "${KUBE_CERT:-}" && ! -z "${KUBE_KEY:-}" ]]; then
+    user_args+=(
+     "--client-certificate=${KUBE_CERT}"
+     "--client-key=${KUBE_KEY}"
+     "--embed-certs=true"
+    )
   fi
 
-  echo "${cluster_args}"
   "${kubectl}" config set-cluster "${CONTEXT}" "${cluster_args[@]}"
   if [[ -n "${user_args[@]:-}" ]]; then
     "${kubectl}" config set-credentials "${CONTEXT}" "${user_args[@]}"
@@ -424,17 +420,11 @@ function yaml-quote {
   echo "'$(echo "${@}" | sed -e "s/'/''/g")'"
 }
 
-# Builds the RUNTIME_CONFIG var from other feature enable options
+# Builds the RUNTIME_CONFIG var from other feature enable options (such as
+# features in alpha)
 function build-runtime-config() {
-  if [[ "${ENABLE_DAEMONSETS}" == "true" ]]; then
-      if [[ -z "${RUNTIME_CONFIG}" ]]; then
-          RUNTIME_CONFIG="extensions/v1beta1/daemonsets=true"
-      else
-          if echo "${RUNTIME_CONFIG}" | grep -q -v "extensions/v1beta1/daemonsets=true"; then
-            RUNTIME_CONFIG="${RUNTIME_CONFIG},extensions/v1beta1/daemonsets=true"
-          fi
-      fi
-  fi
+  # There is nothing to do here for now. Just using this function as a placeholder.
+  :
 }
 
 function write-master-env {
@@ -610,6 +600,11 @@ KUBEPROXY_TEST_LOG_LEVEL: $(yaml-quote ${KUBEPROXY_TEST_LOG_LEVEL})
 EOF
     fi
   fi
+  if [ -n "${NODE_LABELS:-}" ]; then
+      cat >>$file <<EOF
+NODE_LABELS: $(yaml-quote ${NODE_LABELS})
+EOF
+    fi
   if [[ "${OS_DISTRIBUTION}" == "coreos" ]]; then
     # CoreOS-only env vars. TODO(yifan): Make them available on other distros.
     cat >>$file <<EOF

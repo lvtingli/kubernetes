@@ -18,12 +18,6 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-DEBUG="${DEBUG:-false}"
-
-if [ "${DEBUG}" == "true" ]; then
-	set -x
-fi
-
 cert_ip=$1
 extra_sans=${2:-}
 cert_dir=/srv/kubernetes
@@ -52,7 +46,7 @@ if [[ -n "${extra_sans}" ]]; then
   sans="${sans},${extra_sans}"
 fi
 
-tmpdir=$(mktemp -d -t kubernetes_cacert.XXXXXX)
+tmpdir=$(mktemp -d --tmpdir kubernetes_cacert.XXXXXX)
 trap 'rm -rf "${tmpdir}"' EXIT
 cd "${tmpdir}"
 
@@ -68,14 +62,7 @@ cd "${tmpdir}"
 #
 # Due to GCS caching of public objects, it may take time for this to be widely
 # distributed.
-#
-# Use ~/kube/easy-rsa.tar.gz if it exists, so that it can be
-# pre-pushed in cases where an outgoing connection is not allowed.
-if [ -f ~/kube/easy-rsa.tar.gz ]; then
-	ln -s ~/kube/easy-rsa.tar.gz .
-else
-	curl -L -O https://storage.googleapis.com/kubernetes-release/easy-rsa/easy-rsa.tar.gz > /dev/null 2>&1
-fi
+curl -L -O https://storage.googleapis.com/kubernetes-release/easy-rsa/easy-rsa.tar.gz > /dev/null 2>&1
 tar xzf easy-rsa.tar.gz > /dev/null 2>&1
 
 cd easy-rsa-master/easyrsa3

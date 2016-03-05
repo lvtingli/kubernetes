@@ -33,4 +33,4 @@ rm -rf kubernetes
 tar xzf "${SALT_TAR_URL##*/}"
 
 echo "Running release install script"
-sudo kubernetes-salt/kubernetes/saltbase/install.sh "${SERVER_BINARY_TAR_URL##*/}"
+sudo kubernetes/saltbase/install.sh "${SERVER_BINARY_TAR_URL##*/}"

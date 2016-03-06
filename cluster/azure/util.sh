@@ -199,7 +199,7 @@ function detect-minions () {
     if [[ -z "$AZ_CS" ]]; then
         verify-prereqs
     fi
-    ssh_ports=($(eval echo "2200{1..$NUM_MINIONS}"))
+    ssh_ports=($(eval echo "2200{1..$NUM_NODES}"))
     for (( i=0; i<${#MINION_NAMES[@]}; i++)); do
         MINION_NAMES[$i]=$(ssh -oStrictHostKeyChecking=no -i $AZ_SSH_KEY -p ${ssh_ports[$i]} $AZ_CS.cloudapp.net hostname -f)
     done
@@ -330,7 +330,7 @@ function kube-up {
         -b $AZ_SUBNET \
         $AZ_CS $AZ_IMAGE $USER
 
-    ssh_ports=($(eval echo "2200{1..$NUM_MINIONS}"))
+    ssh_ports=($(eval echo "2200{1..$NUM_NODES}"))
 
     #Build up start up script for minions
     echo "--> Building up start up script for minions"

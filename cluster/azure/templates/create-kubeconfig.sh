@@ -20,7 +20,7 @@
 function create-salt-master-auth() {
     BASIC_AUTH_FILE="/srv/kubernetes/basic_auth.csv"
     if [ ! -e "${BASIC_AUTH_FILE}" ]; then
-    mkdir -p /srv/kubernetes/kube-apiserver
+    mkdir -p /srv/kubernetes
     (umask 077;
       echo "${KUBE_PASSWORD},${KUBE_USER},admin" > "${BASIC_AUTH_FILE}")
   fi

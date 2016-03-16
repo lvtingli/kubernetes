@@ -88,6 +88,12 @@ function verify-prereqs {
 
     CONTAINER=kube-$TAG
     echo "==> CONTAINER: $CONTAINER"
+        
+        echo "--> Checking VNet exists..."
+    if [[ -z "$(azure_call network vnet show "$AZ_VNET" 2>/dev/null | grep data)" ]]; then
+        echo "--> Creating VNet..."
+        azure_call network vnet create "$AZ_VNET" --subnet-name="$AZ_SUBNET" --location "$AZ_LOCATION" -v
+    fi
 }
 
 # Create a temp dir that'll be deleted at the end of this bash session.

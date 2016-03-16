@@ -66,14 +66,10 @@ The cluster setup scripts can setup Kubernetes for multiple targets. First modif
 
     KUBERNETES_PROVIDER="azure"
 
-Next, specify an existing virtual network and subnet in `cluster/azure/config-default.sh`:
+Next, specify an virtual network name and subnet name you want to use in `cluster/azure/config-default.sh`:
 
     AZ_VNET=<vnet name>
     AZ_SUBNET=<subnet name>
-
-You can create a virtual network:
-
-    azure network vnet create <vnet name> --subnet-name=<subnet name> --location "West US" -v
 
 Now you're ready.
 
@@ -82,7 +78,7 @@ You can download and install the latest Kubernetes release from [this page](http
     cd kubernetes
     cluster/kube-up.sh
 
-The script above will start (by default) a single master VM along with 4 worker VMs.
+The script above will start (by default) a single master VM along with 2 worker VMs.
 Each VM is size Medium. You can tweak some of these parameters by editing
 `cluster/azure/config-default.sh`.
 
@@ -99,7 +95,7 @@ Access the endpoint in https://${KUBE_MASTER_IP}:443 by username and password in
 The [kubectl](../../docs/user-guide/kubectl/kubectl.md) tool controls the Kubernetes cluster manager.  It lets you inspect your cluster resources, create, delete, and update components, and much more.
 You will use it to look at your new cluster and bring up example apps.
 
-Add the appropriate binary folder to your `PATH` to access kubectl:
+If you can't use kubectl, you can add the appropriate binary folder to your `PATH` to access kubectl:
 
     # OS X
     export PATH=<path/to/kubernetes-directory>/platforms/darwin/amd64:$PATH
